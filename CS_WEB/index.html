@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exploring Computer Science</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Montserrat:wght@400;700&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #1a1a2e;
+            --secondary-bg: #16213e;
+            --accent-color: #e94560;
+            --text-color: #e0e0e0;
+            --code-bg: #0f3460;
+            --code-text: #aaffaa;
+            --border-color: #0f3460;
+            --button-bg: #533483;
+            --button-hover-bg: #9a48be;
+            --heading-color: #bbbbff;
+
+            --one-time-effect-bg: #4a148c;
+            --one-time-effect-shadow: 0 0 25px rgba(233, 69, 96, 0.9);
+            --college-theme-bg: #0d47a1;
+            --college-theme-hover-bg: #1976d2;
+            --college-theme-border: 2px solid #ffeb3b;
+            --college-theme-shadow: 0 5px 20px rgba(0, 0, 0, 0.8), 0 0 15px #ffeb3b;
+            --college-button-pattern-dot: rgba(255, 235, 59, 0.1);
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--heading-color);
+        }
+        h1 {
+            text-shadow: 0 0 10px rgba(187, 187, 255, 0.5);
+        }
+        .highlight {
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+        .subtitle {
+            color: var(--text-color);
+        }
+
+        #backgroundCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            display: none;
+        }
+        #backgroundCanvas.active {
+            opacity: 0.1;
+        }
+
+
+        .main-content-wrapper {
+            background-color: var(--secondary-bg);
+            border-radius: 0.75rem;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            flex-grow: 1;
+        }
+        @media (min-width: 768px) {
+            .main-content-wrapper {
+                padding: 2rem;
+            }
+        }
+
+        .cs-section-card {
+            background-color: var(--secondary-bg);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .cs-section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5), 0 0 15px var(--accent-color);
+        }
+
+        .field-info, .language-section, .lang-resource-item, .video-item {
+            background-color: var(--code-bg);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+        .field-info h3, .language-section h3, .lang-resource-item h4, .video-item h3 {
+            color: var(--heading-color);
+            border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .field-info p, .language-section p, .lang-resource-item p, .video-item p {
+            color: var(--text-color);
+        }
+        .field-info strong, .lang-resource-item strong {
+            color: var(--accent-color);
+        }
+
+        .code-example {
+            background-color: #0d2a4a;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            overflow-x: auto;
+            border: 1px dashed var(--accent-color);
+        }
+        .code-example pre code {
+            color: var(--code-text);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+            display: block;
+            white-space: pre-wrap;
+        }
+
+        .action-button {
+            background-color: var(--button-bg);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            border: none;
+            cursor: pointer;
+            margin: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 200px;
+            text-align: center;
+        }
+        .action-button:hover {
+            background-color: var(--button-hover-bg);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 20px var(--accent-color);
+        }
+        .action-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+        
+        .tab-btn.active {
+            border-color: var(--accent-color);
+            background-color: var(--button-hover-bg);
+            color: white;
+            box-shadow: 0 0 10px rgba(187, 187, 255, 0.3);
+        }
+
+
+        .one-time-effect-applied {
+            background-color: var(--one-time-effect-bg) !important;
+            box-shadow: var(--one-time-effect-shadow) !important;
+            border: 1px solid var(--accent-color) !important;
+            animation: pulse-glow 1.5s infinite alternate;
+        }
+        @keyframes pulse-glow {
+            from {
+                box-shadow: var(--one-time-effect-shadow);
+            }
+            to {
+                box-shadow: 0 0 30px rgba(233, 69, 96, 1), 0 0 10px rgba(233, 69, 96, 0.6);
+            }
+        }
+
+        .college-theme-btn {
+            background-color: var(--college-theme-bg) !important;
+            border: var(--college-theme-border) !important;
+            color: white !important;
+            font-weight: 700 !important;
+            box-shadow: var(--college-theme-shadow) !important;
+        }
+        .college-theme-btn:hover {
+            background-color: var(--college-theme-hover-bg) !important;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9), 0 0 20px #ffeb3b !important;
+        }
+
+        .college-button-pattern {
+            background-image: radial-gradient(var(--college-button-pattern-dot) 1px, transparent 1px) !important;
+            background-size: 15px 15px !important;
+            background-color: var(--college-theme-bg) !important;
+            opacity: 0.95 !important;
+        }
+
+
+        ul {
+            list-style-type: disc;
+            margin-left: 1.25rem;
+            color: var(--text-color);
+        }
+        ul li {
+            margin-bottom: 0.5rem;
+        }
+        ul ul {
+            list-style-type: circle;
+            margin-left: 1.5rem;
+        }
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        a:hover {
+            text-decoration: underline;
+            color: var(--button-hover-bg);
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .video-title {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+            color: var(--heading-color);
+        }
+        .video-meta {
+            font-size: 0.85em;
+            color: rgba(224, 224, 224, 0.7);
+        }
+
+        .content-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .content-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar Styling */
+        /* For Webkit browsers (Chrome, Safari) */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--code-bg);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 10px;
+            border: 2px solid var(--code-bg);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--button-hover-bg);
+        }
+
+        /* For Firefox (requires different properties) */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) var(--code-bg);
+        }
+
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+                padding: 1rem;
+            }
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 1.8rem; }
+            .comparison-grid { flex-direction: column; }
+            .field-info { min-width: unset; width: 100%; }
+            .video-grid { grid-template-columns: 1fr; }
+            .action-button { min-width: unset; }
+        }
+        @media (max-width: 480px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+            .action-button { padding: 0.6rem 1rem; font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="backgroundCanvas"></canvas>
+    <div class="container mx-auto p-4 md:p-8 flex-grow">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold">
+                <span class="highlight">Exploring</span> Computer Science
+            </h1>
+            <p class="mt-2 text-lg subtitle">Unveiling the world of computation and innovation.</p>
+        </header>
+
+        <main>
+            <div class="main-content-wrapper">
+                <div class="button-container text-center mb-8 flex flex-wrap justify-center gap-4">
+                    <div class="flex flex-wrap justify-center gap-4 w-full">
+                        <button id="toggleWhatIsCSBtn" class="action-button tab-btn active">
+                            What is Computer Science?
+                        </button>
+                        <button id="toggleCSvsCEBtn" class="action-button tab-btn">
+                            CS vs. Computer Engineering
+                        </button>
+                        <button id="toggleCSvsDSBtn" class="action-button tab-btn">
+                            CS vs. Data Science
+                        </button>
+                        <button id="toggleCodingContentBtn" class="action-button tab-btn">
+                            Introduction to Coding Languages
+                        </button>
+                        <button id="toggleStudyMethodsBtn" class="action-button tab-btn">
+                            Best Ways to Study Programming
+                        </button>
+                        <button id="toggleSaudiCollegesBtn" class="action-button tab-btn">
+                            Computer Science Colleges in Saudi Arabia
+                        </button>
+                    </div>
+                </div>
+
+                <section id="what-is-cs" class="cs-section-card content-hidden">
+                    <h2 class="text-2xl font-bold mb-3">What is Computer Science?</h2>
+                    <p class="leading-relaxed">Computer Science (CS) is a vast and dynamic field that explores the theoretical foundations of information and computation and their practical applications. It encompasses the study of algorithms, data structures, programming languages, computer architecture, artificial intelligence, software development, and much more. At its core, CS is about understanding how computers work, designing efficient solutions to complex problems, and creating the software that drives our modern world.</p>
+                    <p class="leading-relaxed">Key areas include:</p>
+                    <ul>
+                        <li><strong>Algorithms & Data Structures:</strong> The backbone of efficient problem-solving and data organization.</li>
+                        <li><strong>Programming Languages:</strong> Tools for instructing computers, ranging from low-level to high-level.</li>
+                        <li><strong>Operating Systems:</strong> Software that manages computer hardware and software resources.</li>
+                        <li><strong>Computer Networks:</strong> The study of how computers connect and communicate.</li>
+                        <li><strong>Artificial Intelligence & Machine Learning:</strong> Enabling machines to learn, reason, and perceive.</li>
+                        <li><strong>Software Engineering:</strong> Principles for designing, developing, and maintaining software systems.</li>
+                    </ul>
+                </section>
+
+                <section id="cs-vs-ce" class="cs-section-card content-hidden">
+                    <h2 class="text-2xl font-bold mb-3">Computer Science vs. Computer Engineering</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="field-info">
+                            <h3 class="text-xl font-semibold">Computer Science (CS)</h3>
+                            <p><strong>Focus:</strong> Primarily on software, algorithms, and theoretical aspects of computing. CS professionals design and develop the logical systems and applications that run on computers.</p>
+                            <p><strong>Curriculum Highlights:</strong></p>
+                            <ul>
+                                <li>Advanced Algorithms</li>
+                                <li>Programming Paradigms</li>
+                                <li>Operating Systems Design</li>
+                                <li>Database Management</li>
+                                <li>Artificial Intelligence</li>
+                                <li>Software Development Life Cycle</li>
+                            </ul>
+                            <p><strong>Career Paths:</strong> Software Developer, Data Scientist (often with additional training), AI Engineer, Web Developer, Cybersecurity Analyst, Systems Architect.</p>
+                        </div>
+                        <div class="field-info">
+                            <h3 class="text-xl font-semibold">Computer Engineering (CE)</h3>
+                            <p><strong>Focus:</strong> Integrates principles of electrical engineering and computer science to design, develop, and optimize computer hardware and firmware. CE professionals build the physical components of computing systems and the low-level software that directly interacts with hardware.</p>
+                            <p><strong>Curriculum Highlights:</strong></p>
+                            <ul>
+                                <li>Digital Logic Design & Circuit Theory</li>
+                                <li>Microprocessor Systems & Architecture</li>
+                                <li>Embedded Systems (Hardware/Software Co-design)</li>
+                                <li>VLSI Design (Very Large Scale Integration)</li>
+                                <li>Robotics & Control Systems</li>
+                                <li>Operating Systems (with a hardware perspective)</li>
+                            </ul>
+                            <p><strong>Career Paths:</strong> Hardware Engineer, Embedded Systems Engineer, Robotics Engineer, Network Architect (hardware focus), Firmware Developer, ASIC/FPGA Designer, Systems Engineer.</p>
+                        </div>
+                    </div>
+                    <p class="mt-4 leading-relaxed text-center">While both fields are interconnected and often collaborate, Computer Science typically deals with the "brains" of the computer (software and logic), while Computer Engineering focuses on the "body" (hardware and and its interaction with software), bridging the gap between the physical and digital worlds.</p>
+                </section>
+
+                <section id="cs-vs-ds" class="cs-section-card content-hidden">
+                    <h2 class="text-2xl font-bold mb-3">Computer Science vs. Data Science</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="field-info">
+                            <h3 class="text-xl font-semibold">Computer Science (CS)</h3>
+                            <p><strong>Focus:</strong> Broader field focused on the theoretical foundations of information and computation, and the design and development of software systems, algorithms, and computer hardware. It's about *how* computers and software work and *how* to build them.</p>
+                            <p><strong>Curriculum Highlights:</strong></p>
+                            <ul>
+                                <li>Algorithms & Data Structures (design & analysis)</li>
+                                <li>Programming Languages & Paradigms</li>
+                                <li>Operating Systems & Networking</li>
+                                <li>Software Engineering principles</li>
+                                <li>Computer Architecture</li>
+                                <li>Theoretical Computer Science (computability, complexity)</li>
+                                <li>Artificial Intelligence (foundations)</li>
+                            </ul>
+                            <p><strong>Key Skills:</strong> Strong programming, problem-solving, logical thinking, software design, understanding of computational efficiency, system building.</p>
+                            <p><strong>Career Paths:</strong> Software Developer, Systems Architect, Web Developer, Cybersecurity Analyst, Game Developer, AI/ML Engineer (often from a system/tool-building perspective).</p>
+                        </div>
+                        <div class="field-info">
+                            <h3 class="text-xl font-semibold">Data Science (DS)</h3>
+                            <p><strong>Focus:</strong> An interdisciplinary field that uses scientific methods, processes, algorithms, and systems to extract knowledge and insights from structured and unstructured data. It's about *what* the data reveals and *how* to use it to make informed decisions.</p>
+                            <p><strong>Curriculum Highlights:</strong></p>
+                            <ul>
+                                <li>Statistics & Probability</li>
+                                <li>Machine Learning & Deep Learning</li>
+                                <li>Data Mining & Data Warehousing</li>
+                                <li>Data Visualization</li>
+                                <li>Big Data Technologies (e.g., Hadoop, Spark)</li>
+                                <li>Predictive Modeling</li>
+                                <li>Database Management (focused on data extraction & manipulation)</li>
+                            </ul>
+                            <p><strong>Key Skills:</strong> Statistical modeling, data analysis, machine learning algorithms, data manipulation (SQL, Python/R), data storytelling, domain knowledge, strong mathematical intuition.</p>
+                            <p><strong>Career Paths:</strong> Data Scientist, Data Analyst, Machine Learning Engineer (often from a model-building/application perspective), Business Intelligence Analyst, AI Researcher (focused on data-driven insights).</p>
+                        </div>
+                    </div>
+                    <p class="mt-4 leading-relaxed text-center">While Computer Science provides the foundational tools and systems, Data Science leverages these tools to extract meaning and make predictions from data. There's a significant overlap, especially in areas like machine learning, but their core objectives and day-to-day tasks often differ.</p>
+                </section>
+
+                <section id="coding-content-group" class="cs-section-card content-hidden max-h-96 overflow-y-auto p-4">
+                    <section id="intro-languages">
+                        <h2 class="text-2xl font-bold mb-3">Introduction to Coding Languages</h2>
+                        <p class="leading-relaxed">Programming languages are the means by which we communicate with computers. Each language has its strengths and is suited for different types of tasks. Here are a few prominent ones, along with examples and how they compare to others:</p>
+
+                        <div class="language-section mb-6">
+                            <h3 class="text-xl font-semibold">C++</h3>
+                            <p>C++ is a powerful, high-performance, general-purpose programming language developed by Bjarne Stroustrup. It supports object-oriented programming (OOP), generic programming, and imperative programming. It's widely used in systems programming, game development, high-performance computing, and embedded systems due to its efficiency and control over hardware resources.</p>
+                            <p><strong>Comparison:</strong> C++ offers unparalleled control over system resources and memory, making it ideal for performance-critical applications. Compared to Python, it has a steeper learning curve but significantly faster execution speed. It's often chosen over C# for low-level tasks where direct hardware interaction and maximum optimization are paramount.</p>
+                            <h4 class="text-lg font-semibold mt-4 mb-2">Example: Calculating Factorial</h4>
+                            <div class="code-example">
+                                <pre><code class="language-cpp">#include <iostream>
+
+long long factorial(int n) {
+    if (n == 0)
+        return 1;
+    else
+        return n * factorial(n - 1);
+}
+
+int main() {
+    int num = 5;
+    std::cout << "Factorial of " << num << " is " << factorial(num) << std::endl;
+    return 0;
+}
+</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="language-section mb-6">
+                            <h3 class="text-xl font-semibold">Python</h3>
+                            <p>Python is a high-level, interpreted, general-purpose programming language known for its readability and simplicity. Created by Guido van Rossum, it emphasizes code readability with its notable use of significant indentation. Python is extensively used in web development (backend), data science, machine learning, artificial intelligence, scientific computing, and automation.</p>
+                            <p><strong>Comparison:</strong> Python is much easier to learn and write compared to C++ or C# due to its simpler syntax and dynamic typing. It excels in rapid prototyping and has a vast ecosystem of libraries, making it highly productive for data-intensive tasks and AI. While generally slower than compiled languages like C++ or C#, its ease of use often outweighs this for many applications.</p>
+                            <h4 class="text-lg font-semibold mt-4 mb-2">Example: Check if a number is Prime</h4>
+                            <div class="code-example">
+                                <pre><code class="language-python">def is_prime(num):
+    if num <= 1:
+        return False
+    for i in range(2, int(num**0.5) + 1):
+        if num % i == 0:
+            return False
+    return True
+
+number_to_check = 17
+if is_prime(number_to_check):
+    print(f"{number_to_check} is a prime number.")
+else:
+    print(f"{number_to_check} is not a prime number.")
+</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="language-section mb-6">
+                            <h3 class="text-xl font-semibold">C# (C Sharp)</h3>
+                            <p>C# is a modern, object-oriented programming language developed by Microsoft as part of its .NET initiative. It's designed for building a wide range of applications that run on the .NET platform, including Windows desktop applications, web applications (ASP.NET), mobile apps (Xamarin), and game development (Unity).</p>
+                            <p><strong>Comparison:</strong> C# is a strongly-typed, managed language, offering a balance between performance and development speed. It's often compared to Java due to similar syntax and object-oriented principles but is deeply integrated into the Microsoft ecosystem. While not as low-level as C++, it provides better performance and more control than Python for complex enterprise applications and game development.</p>
+                            <h4 class="text-lg font-semibold mt-4 mb-2">Example: Simple Class and Object</h4>
+                            <div class="code-example">
+                                <pre><code class="language-csharp">using System;
+
+public class Dog
+{
+    public string Name { get; set; }
+    public string Breed { get; set; }
+
+    public Dog(string name, string breed)
+    {
+        Name = name;
+        Breed = breed;
+    }
+
+    public void Bark()
+    {
+        Console.WriteLine($"{Name} says Woof!");
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Dog myDog = new Dog("Buddy", "Golden Retriever");
+        Console.WriteLine($"My dog's name is {myDog.Name} and he is a {myDog.Breed}.");
+        myDog.Bark();
+    }
+}
+</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="language-section mb-6">
+                            <h3 class="text-xl font-semibold">JavaScript</h3>
+                            <p>JavaScript is a high-level, often just-in-time compiled, multi-paradigm programming language that conforms to the ECMAScript specification. It is best known as the scripting language for web pages, but it's also used in many non-browser environments (e.g., Node.js for backend, React Native for mobile apps). It enables interactive front-end web development.</p>
+                            <p><strong>Comparison:</strong> JavaScript is unique for its native execution in web browsers, making it indispensable for front-end web development. With Node.js, it can also be used for backend development, allowing for full-stack JavaScript applications. Unlike statically-typed languages like C++ and C#, JavaScript is dynamically typed, offering more flexibility but potentially leading to runtime errors. It's more focused on web interactivity compared to Python's general-purpose nature, though both are popular for web development.</p>
+                            <h4 class="text-lg font-semibold mt-4 mb-2">Example: Basic Event Handling (HTML context)</h4>
+                            <div class="code-example">
+                                <pre><code class="language-javascript">document.getElementById('myButton').addEventListener('click', function() {
+    alert('Button was clicked!');
+    this.style.backgroundColor = 'blue';
+});
+
+let total = 0;
+for (let i = 1; i <= 5; i++) {
+    total += i;
+}
+console.log("Sum from 1 to 5:", total);
+</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="language-resources">
+                        <h2 class="text-2xl font-bold mb-3">Resources for Learning Specific Programming Languages</h2>
+                        <p class="leading-relaxed">Once you've grasped core computer science concepts, or even alongside them, mastering specific programming languages is crucial. Here are highly recommended resources for the languages mentioned on this page:</p>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="lang-resource-item">
+                                <h4 class="text-xl font-semibold">C++</h4>
+                                <ul>
+                                    <li><strong><a href="https://www.learncpp.com/" target="_blank">LearnCpp.com</a>:</strong> A highly recommended, comprehensive free tutorial covering C++ from basics to advanced topics.</li>
+                                    <li><strong><a href="https://en.cppreference.com/w/" target="_blank">cppreference.com</a>:</strong> An essential, detailed reference for C++ language features and the standard library.</li>
+                                    <li><strong>Books:</strong> "C++ Primer" by Stanley B. Lippman, Josée Lajoie, and Barbara E. Moo; "Effective C++" by Scott Meyers for best practices.</li>
+                                </ul>
+                            </div>
+                            <div class="lang-resource-item">
+                                <h4 class="text-xl font-semibold">Python</h4>
+                                <ul>
+                                    <li><strong><a href="https://docs.python.org/3/" target="_blank">Official Python Documentation</a>:</strong> The definitive and always up-to-date guide directly from the Python Software Foundation.</li>
+                                    <li><strong><a href="https://realpython.com/" target="_blank">Real Python</a>:</strong> Offers high-quality, practical tutorials and articles for all skill levels, with a strong focus on real-world applications.</li>
+                                    <li><strong><a href="https://www.codecademy.com/learn/learn-python-3" target="_blank">Codecademy</a> & <a href="https://www.datacamp.com/" target="_blank">DataCamp</a>:</strong> Interactive platforms great for hands-on learning, especially for data science and web development with Python.</li>
+                                </ul>
+                            </div>
+                            <div class="lang-resource-item">
+                                <h4 class="text-xl font-semibold">C# (C Sharp)</h4>
+                                <ul>
+                                    <li><strong><a href="https://learn.microsoft.com/en-us/dotnet/csharp/" target="_blank">Microsoft Learn (C#)</a>:</strong> Official and comprehensive tutorials directly from Microsoft, covering everything from basics to advanced .NET development.</li>
+                                    <li><strong><a href="https://unity.com/learn" target="_blank">Unity Learn</a>:</strong> An excellent resource if you're interested in game development using C# with the Unity engine.</li>
+                                    <li><strong><a href="https://www.pluralsight.com/" target="_blank">Pluralsight</a>:</strong> Provides in-depth video courses and learning paths for C# and the wider .NET ecosystem by industry experts.</li>
+                                </ul>
+                            </div>
+                            <div class="lang-resource-item">
+                                <h4 class="text-xl font-semibold">JavaScript</h4>
+                                <ul>
+                                    <li><strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">MDN Web Docs (JavaScript)</a>:</strong> The go-to reference for all web technologies, offering comprehensive guides and tutorials.</li>
+                                    <li><strong><a href="https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/" target="_blank">freeCodeCamp</a>:</strong> Offers interactive lessons and certifications for web development, with a strong focus on JavaScript algorithms and data structures.</li>
+                                    <li><strong><a href="https://www.theodinproject.com/" target="_blank">The Odin Project</a>:</strong> A comprehensive, free, open-source curriculum that covers full-stack web development, heavily featuring JavaScript and its frameworks.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="recommended-videos">
+                        <h2 class="text-2xl font-bold mb-3">Video Introductions to Programming Languages</h2>
+                        <p class="leading-relaxed">Sometimes the best way to get started is by watching an introduction. Here are some highly-rated YouTube videos to help you get a quick overview of each language:</p>
+
+                        <div class="video-grid grid md:grid-cols-2 gap-6">
+                            <div class="video-item">
+                                <h3 class="text-lg font-semibold">Python Introduction</h3>
+                                <div class="video-wrapper">
+                                    <iframe src="https://www.youtube.com/embed/rfscVS0vtbw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                                <p class="video-title">Python for Beginners - Learn Coding with Python in 1 Hour by Programming with Mosh</p>
+                                <p class="video-meta">Views: 22,263,196 | Published: 2020-09-16</p>
+                            </div>
+                            <div class="video-item">
+                                <h3 class="text-lg font-semibold">C++ Introduction</h3>
+                                <div class="video-wrapper">
+                                    <iframe src="https://www.youtube.com/embed/ZzaPdXTrSb8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                                <p class="video-title">C++ Tutorial for Beginners - Learn C++ in 1 Hour by Programming with Mosh</p>
+                                <p class="video-meta">Views: 5,430,441 | Published: 2022-08-10</p>
+                            </div>
+                            <div class="video-item">
+                                <h3 class="text-lg font-semibold">C# Introduction</h3>
+                                <div class="video-wrapper">
+                                    <iframe src="https://www.youtube.com/embed/GhQdlIFylQ8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                                <p class="video-title">C# Tutorial - Full Course for Beginners by freeCodeCamp.org</p>
+                                <p class="video-meta">Views: 8,690,628 | Published: 2018-09-06</p>
+                            </div>
+                            <div class="video-item">
+                                <h3 class="text-lg font-semibold">JavaScript Introduction</h3>
+                                <div class="video-wrapper">
+                                    <iframe src="https://www.youtube.com/embed/W6NZfCO5SIk" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                                <p class="video-title">JavaScript Course for Beginners – Your First Step to Web Development by Programming with Mosh</p>
+                                <p class="video-meta">Views: 14,235,656 | Published: 2018-04-24</p>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+
+                <section id="study-methods" class="cs-section-card content-hidden">
+                    <h2 class="text-2xl font-bold mb-3">Best Ways to Study Programming</h2>
+                    <p class="leading-relaxed">Learning to program is a journey that requires consistent effort and effective strategies. Here are some of the best methods to master programming:</p>
+                    <ul>
+                        <li><strong>Start with Fundamentals:</strong> Before diving deep into complex topics or frameworks, ensure you have a strong grasp of programming fundamentals like variables, data types, control structures (loops, conditionals), functions, and basic data structures (arrays, lists).</li>
+                        <li><strong>Practice Consistently (Coding Challenges):</strong> The most crucial aspect of learning programming is active practice. Solve coding challenges regularly on platforms like LeetCode, HackerRank, Codecademy, or Exercism. This builds problem-solving skills and reinforces syntax.</li>
+                        <li><strong>Build Projects:</strong> Apply your knowledge by building small to medium-sized projects. Start with simple applications (e.g., a calculator, to-do list, simple game) and gradually increase complexity. Projects solidify your understanding and give you tangible results.</li>
+                        <li><strong>Understand, Don't Just Memorize:</strong> Focus on understanding *why* a particular solution works rather than just memorizing code. Debugging your own code and understanding error messages is a key skill.</li>
+                        <li><strong>Read Documentation & Official Guides:</strong> Learn to read and understand official language documentation and API references. This is a vital skill for any professional developer.</li>
+                        <li><strong>Break Down Complex Problems:</strong> When faced with a large problem, break it down into smaller, manageable sub-problems. Solve each sub-problem individually and then integrate them.</li>
+                        <li><strong>Collaborate & Get Feedback:</strong> Work with others, participate in open-source projects, or join coding communities. Explaining concepts to others and getting feedback on your code can accelerate learning.</li>
+                        <li><strong>Version Control (Git/GitHub):</strong> Learn to use Git and platforms like GitHub early on. It's essential for tracking changes, collaborating, and managing your projects.</li>
+                        <li><strong>Stay Updated:</strong> Technology evolves rapidly. Keep learning new languages, frameworks, and tools. Follow industry blogs, tutorials, and attend workshops or webinars.</li>
+                        <li><strong>Take Breaks & Stay Persistent:</strong> Programming can be challenging. Take regular breaks to avoid burnout and don't get discouraged by errors. Persistence is key!</li>
+                    </ul>
+                </section>
+
+                <section id="saudi-cs-colleges-content" class="cs-section-card content-hidden">
+                    <h3 class="text-2xl font-bold mb-3">Computer Science Colleges in Saudi Arabia 🎓📚🏛️</h3>
+                    <ul class="list-disc list-inside text-gray-200 space-y-2">
+                        <li>King Abdullah University of Science and Technology (KAUST)</li>
+                        <li>King Saud University</li>
+                        <li>Prince Sultan University</li>
+                        <li>King Fahd University of Petroleum and Minerals</li>
+                        <li>Alfaisal University</li>
+                        <li>King Abdulaziz University</li>
+                        <li>Taif University</li>
+                        <li>Prince Sattam Bin Abdulaziz University</li>
+                        <li>Effat University</li>
+                        <li>King Faisal University</li>
+                    </ul>
+                    <p class="text-sm text-gray-400 mt-4">
+                        This list provides an overview of institutions with strong Computer Science programs in Saudi Arabia.
+                    </p>
+                </section>
+            </div>
+        </main>
+
+        <footer class="text-center mt-8 text-slate-500 text-sm">
+            <p>Credits to my colleagues that helped me get a clear idea of this project, and a special thanks to my special teacher, mohammed ali</p>
+        </footer>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('backgroundCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+
+        const codeCharacters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+-=[]{}|;:,.<>/?`~'.split('');
+        const collegeEmojis = ['🎓', '📄', '📚', '💻', '💡'];
+
+        const drops = [];
+        const fontSize = 16;
+        let columns;
+        let activeCharacters = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            columns = canvas.width / fontSize;
+            initializeDrops();
+        }
+
+        function initializeDrops() {
+            drops.length = 0;
+            for (let i = 0; i < columns; i++) {
+                drops[i] = 1;
+            }
+        }
+
+        function drawCanvasEffect() {
+            if (!canvas.classList.contains('active')) {
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                    animationFrameId = null;
+                }
+                return;
+            }
+
+            ctx.fillStyle = 'rgba(26, 26, 46, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = `${fontSize}px Fira Code`;
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = activeCharacters[Math.floor(Math.random() * activeCharacters.length)];
+                ctx.fillStyle = canvas.dataset.type === 'college' ? '#FFD700' : '#00FF00';
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+            animationFrameId = requestAnimationFrame(drawCanvasEffect);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleWhatIsCSBtn = document.getElementById('toggleWhatIsCSBtn');
+            const toggleCSvsCEBtn = document.getElementById('toggleCSvsCEBtn');
+            const toggleCSvsDSBtn = document.getElementById('toggleCSvsDSBtn');
+            const toggleCodingContentBtn = document.getElementById('toggleCodingContentBtn');
+            const toggleStudyMethodsBtn = document.getElementById('toggleStudyMethodsBtn');
+            const toggleSaudiCollegesBtn = document.getElementById('toggleSaudiCollegesBtn');
+            
+
+            const whatIsCSSection = document.getElementById('what-is-cs');
+            const csVsCESection = document.getElementById('cs-vs-ce');
+            const csVsDSSection = document.getElementById('cs-vs-ds');
+            const codingContentGroup = document.getElementById('coding-content-group');
+            const studyMethodsSection = document.getElementById('study-methods');
+            const saudiCollegesSection = document.getElementById('saudi-cs-colleges-content');
+
+            const allSections = [
+                whatIsCSSection,
+                csVsCESection,
+                csVsDSSection,
+                codingContentGroup,
+                studyMethodsSection,
+                saudiCollegesSection
+            ];
+
+            const tabButtons = [
+                toggleWhatIsCSBtn,
+                toggleCSvsCEBtn,
+                toggleCSvsDSBtn,
+                toggleCodingContentBtn,
+                toggleStudyMethodsBtn,
+                toggleSaudiCollegesBtn
+            ];
+
+            function showContent(contentToShow, activeBtn) {
+                allSections.forEach(section => {
+                    section.classList.remove('content-visible');
+                    section.classList.add('content-hidden');
+                });
+
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.remove('one-time-effect-applied');
+                    btn.classList.remove('college-theme-btn');
+                    btn.classList.remove('college-button-pattern');
+                });
+
+                contentToShow.classList.remove('content-hidden');
+                contentToShow.classList.add('content-visible');
+                activeBtn.classList.add('active');
+
+                if (activeBtn === toggleCodingContentBtn) {
+                    activeBtn.classList.add('one-time-effect-applied');
+                    canvas.classList.add('active');
+                    canvas.style.display = 'block';
+                    canvas.dataset.type = 'code';
+                    activeCharacters = codeCharacters;
+                    initializeDrops();
+                    if (!animationFrameId) {
+                        drawCanvasEffect();
+                    }
+                } else if (activeBtn === toggleSaudiCollegesBtn) {
+                    activeBtn.classList.add('college-theme-btn');
+                    activeBtn.classList.add('college-button-pattern');
+                    canvas.classList.add('active');
+                    canvas.style.display = 'block';
+                    canvas.dataset.type = 'college';
+                    activeCharacters = collegeEmojis;
+                    initializeDrops();
+                    if (!animationFrameId) {
+                        drawCanvasEffect();
+                    }
+                } else {
+                    canvas.classList.remove('active');
+                    canvas.style.display = 'none';
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                        animationFrameId = null;
+                    }
+                }
+
+                document.querySelector('.main-content-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            toggleWhatIsCSBtn.addEventListener('click', () => {
+                showContent(whatIsCSSection, toggleWhatIsCSBtn);
+            });
+            toggleCSvsCEBtn.addEventListener('click', () => {
+                showContent(csVsCESection, toggleCSvsCEBtn);
+            });
+            toggleCSvsDSBtn.addEventListener('click', () => {
+                showContent(csVsDSSection, toggleCSvsDSBtn);
+            });
+            toggleCodingContentBtn.addEventListener('click', () => {
+                showContent(codingContentGroup, toggleCodingContentBtn);
+            });
+            toggleStudyMethodsBtn.addEventListener('click', () => {
+                showContent(studyMethodsSection, toggleStudyMethodsBtn);
+            });
+            toggleSaudiCollegesBtn.addEventListener('click', () => {
+                showContent(saudiCollegesSection, toggleSaudiCollegesBtn);
+            });
+
+            showContent(whatIsCSSection, toggleWhatIsCSBtn);
+
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+        });
+    </script>
+</body>
+</html>
